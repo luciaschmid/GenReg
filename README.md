@@ -8,21 +8,22 @@ If you are working on one of the ToDos add your name behind it and create a bran
 the task create a merge request and write in the telegram chat so that a team member reviews your code and completes the merge asap.
 Feel free to add missing ToDos.
 
-Also it would make sense to stay close to the coding style used in the exercises of the lecture. This way the code will look uniform and tidy.
+It would also make sense to stay close to the coding style used in the exercises of the lecture. This way the code will look uniform and tidy.
 
 ## ToDos
 ### Basic Implementation
-- create main notebook/file that downloads data and runs most simple configuration
-- complete dataloader
-- basic data preprocessing (see section 4.1 of paper)
-- implement PointMixer
-- implement Feature Interaction module
-- implement decoder
-- implement PDSAC
-- implement discriminator neural network
-- complete training file
-- add visualization
-- run basic implementation successfully
+- edit [main notebook](main.ipynb) (currently only downloads data) to run simple configuration
+- [Data ModelNet40](data/ModelNet40.py): complete dataloader and basic data preprocessing (see section 4.1 of paper)
+- [Data 7Scenes](data/7Scenes.py): complete dataloader and basic data preprocessing (section 4.1, be aware that data is in tsdf folder in data after running main notebook)
+- implement [PointMixer](model/pointmixer.py) (see section 3.1 and appendix section 1.1)
+- implement [Feature Interaction module](model/featureinteraction.py) (see section 3.2)
+- implement [decoder](model/decoder.py) (see appendix section 1.1)
+- implement [PDSAC](model/pdsac.py) (see section 3.3)
+- add forward function for [generator](model/generator.py) (should be done after all parts of generator are implemented to know all necessary parameters)
+- implement [discriminator neural network](model/discriminator.py) (see appendix section 1.1)
+- complete [training file](training/train_genreg.py) (see section 3.4 and Appendix section 1.2)
+- add visualization file(s) (no designated file/file folder yet)
+- run overfit successfully
 ### Experiments
 - first add sub ToDos
 - 4.3
