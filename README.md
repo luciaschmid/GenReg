@@ -3,6 +3,8 @@ Implementation of paper "GenReg: Deep Generative Method for Fast Point Cloud Reg
 
 This implementation is not the official code, it is community code for a university project.
 
+For data as in the paper the datasets ModelNet40 [[2]](#2) and 7Scenes [[3]](#3) are used.
+
 ## Proposed code of conduct
 If you are working on one of the ToDos add your name behind it and create a branch with the same or similar name to the todo. When you finished 
 the task create a merge request and write in the telegram chat so that a team member reviews your code and completes the merge asap.
@@ -33,6 +35,16 @@ It would also make sense to stay close to the coding style used in the exercises
 
 ## References
 <a id="1">[1]</a> 
-Xiaoshui Huang, Zongyi Xu, Guofeng Mei, Sheng Li, Jian Zhang, Yifan Zuo, Yucheng Wang (2019). 
-GenReg: Deep Generative Method for Fast Point Cloud Registration.
-ArXiv abs/2111.11783 (2021)
+Xiaoshui Huang, Zongyi Xu, Guofeng Mei, Sheng Li, Jian Zhang, Yifan Zuo, Yucheng Wang.\
+GenReg: Deep Generative Method for Fast Point Cloud Registration.\
+[ArXiv abs/2111.11783](https://arxiv.org/abs/2111.11783) (2021)
+
+<a id="2">[2]</a>
+Z. Wu, S. Song, A. Khosla, F. Yu, L. Zhang, X. Tang and J. Xiao.\
+3D ShapeNets: A Deep Representation for Volumetric Shapes\
+Proceedings of 28th IEEE Conference on Computer Vision and Pattern Recognition (CVPR2015)
+
+<a id="3">[3]</a>
+Jamie Shotton, Ben Glocker, Christopher Zach, Shahram Izadi, Antonio Criminisi, Andrew Fitzgibbon.\
+Scene Coordinate Regression Forests for Camera Relocalization in RGB-D Images\
+Proc. Computer Vision and Pattern Recognition (CVPR) | June 2013	
