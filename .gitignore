@@ -125,5 +125,15 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+
+
 # Pyre type checker
 .pyre/
+
+
+*.zip
+*.tar.gz
+*.tar.xz
+*.rar
+
+data/ModelNet40
