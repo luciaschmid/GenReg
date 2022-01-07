@@ -7,12 +7,16 @@ datasets = {
 }
 
 def download_dataset(dataset):
+    if dataset not in list(datasets.keys()):
+        raise Exception("Not a valid dataset choice!!!")
+
     print(f'Downloading {dataset}...')
     subprocess.run(["wget", datasets[dataset], "-P", "data"])
-    print('Extracting ModelNet40...')
-    subprocess.run(["unzip", "-q", f"data/{dataset}.zip", "-d", "data"])
-    subprocess.run(["rm", f"data/{dataset}.zip"])
-    print('ModelNet40 done')
+    print(f'Extracting {dataset}...')
+    name = "tsdf" if dataset == "7Scenes" else dataset
+    subprocess.run(["unzip", "-q", f"data/{name}.zip", "-d", "data"])
+    subprocess.run(["rm", f"data/{name}.zip"])
+    print(f'{dataset} done')
 
 
 if __name__ == "__main__":
@@ -26,7 +30,5 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--dataset', type=str, default="ModelNet40", help='Which dataset to download ModelNet40 or 7Scenes')
     args = parser.parse_args()
     dataset = args.dataset
-    if dataset not in list(datasets.keys()):
-        raise Exception("Not a valid dataset choice!!!")
 
     download_dataset(args.dataset)
