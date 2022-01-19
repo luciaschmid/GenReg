@@ -7,11 +7,6 @@ class FeatureInteraction(nn.Module):
         self.max_pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=padding)
 
     def forward(self, feat1, feat2):
-        assert feat1.shape[1] == 128, f"FeatureInteraction received feat1 with wrong dimensions. " \
-                                      f"Input is {feat1.shape}, expected [-1. 128, n_points]"
-        assert feat2.shape[1] == 128, f"FeatureInteraction received feat2 with wrong dimensions. " \
-                                      f"Input is {feat2.shape}, expected [-1. 128, n_points]"
-
         g1, g2 = self.max_pool(feat1), self.max_pool(feat2)
         diff = g2 - g1
         fusion1, fusion2 = torch.cat([feat1, diff], dim=1), torch.cat([feat2, diff], dim=1)
