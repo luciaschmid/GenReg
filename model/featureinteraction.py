@@ -13,9 +13,9 @@ class FeatureInteraction(nn.Module):
         return fusion1, fusion2
 
 if __name__ == "__main__":
-    feat1, feat2 = torch.rand((2, 128, 10)), torch.rand((2, 128, 10))
+    feat1, feat2 = torch.rand((2, 128, 1024)), torch.rand((2, 128, 1024))
     feature_interaction = FeatureInteraction()
     fusion1, fusion2 = feature_interaction(feat1, feat2)
     print("fusion1 and fusion2 output shapes are", fusion1.shape, fusion2.shape)
-    assert fusion1.shape == (2, 256, 10)
-    assert fusion2.shape == (2, 256, 10)
+    assert fusion1.shape == (2, 256, 1024)
+    assert fusion2.shape == (2, 256, 1024)
