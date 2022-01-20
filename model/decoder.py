@@ -28,8 +28,8 @@ class ConvGELU(nn.Module):
         return self.model(x)
 
 if __name__ == "__main__":
-    x = torch.rand((2, 256, 10)) # (batches, channels, number of points)
+    x = torch.rand((2, 256, 1024)) # (batches, channels, number of points)
     decoder = Decoder(256)
     output = decoder(x)
     print("output shape is ", output.shape)
-    assert output.shape == (2, 3, 10)
+    assert output.shape == (2, 3, 1024)
