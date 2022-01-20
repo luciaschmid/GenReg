@@ -6,7 +6,7 @@ This implementation is not the official code, it is community code for a univers
 For data as in the paper the datasets ModelNet40 [[2]](#2) and 7Scenes [[3]](#3) are used.
 
 ## Proposed code of conduct
-If you are working on one of the ToDos add your name behind it and create a branch with the same or similar name to the todo. When you finished 
+If you are working on one of the ToDos create a branch with the same or similar name to the todo. When you finished 
 the task create a merge request and write in the telegram chat so that a team member reviews your code and completes the merge asap.
 Feel free to add missing ToDos.
 
