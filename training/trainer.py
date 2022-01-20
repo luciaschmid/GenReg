@@ -4,6 +4,7 @@ from model.generator import Generator
 from model.discriminator import Discriminator
 
 
+
 def train(model, train_dataloader, device, config):
     # TODO
     pass
