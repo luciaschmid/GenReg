@@ -16,7 +16,7 @@ It would also make sense to stay close to the coding style used in the exercises
 ### Basic Implementation
 - edit [main notebook](main.ipynb) (currently only downloads data) to run simple configuration
 - [Data ModelNet40](data/ModelNet40.py): complete dataloader and basic data preprocessing (see section 4.1 of paper)
-- [Data 7Scenes](data/7Scenes.py): complete dataloader and basic data preprocessing (section 4.1, be aware that data is in tsdf folder in data after running main notebook)
+- [Data 7Scenes](data/SevenScenes.py): complete dataloader and basic data preprocessing (section 4.1, be aware that data is in tsdf folder in data after running main notebook)
 - implement [PointMixer](model/pointmixer.py) (see section 3.1 and appendix section 1.1)
 - implement [Feature Interaction module](model/featureinteraction.py) (see section 3.2)
 - implement [decoder](model/decoder.py) (see appendix section 1.1)

@@ -1,3 +1,7 @@
+open3d~=0.14.1
+plyfile~=0.7.4
+torchvision~=0.2.2
+pytorch3d~=0.0.1
 jupyter>=1.0.0
 K3D>=2.9.4
 matplotlib>=3.4.1
