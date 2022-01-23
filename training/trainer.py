@@ -1,4 +1,3 @@
-from pathlib import Path
 import torch
 from torch import nn
 from torch.optim.lr_scheduler import MultiStepLR
@@ -6,10 +5,6 @@ from torch.optim.lr_scheduler import MultiStepLR
 from model.generator import Generator
 from model.discriminator import Discriminator
 from utils.invmat import InvMatrix
-
-class Loss(nn.Module):
-    def init(self):
-        ...
 
 class Trainer:
     def __init__(self, params, dataloaders, num_workers=12):
@@ -21,7 +16,7 @@ class Trainer:
 
         self.G_model = Generator()
         # G_model.apply(xavier_init)
-        self.G_model = torch.nn.DataParallel(self.G_model).to(self.device)
+        self.G_model = nn.DataParallel(self.G_model).to(self.device)
         self.D_model = Discriminator()
         # D_model.apply(xavier_init)
         self.D_model = torch.nn.DataParallel(self.D_model).to(self.device)
@@ -33,7 +28,7 @@ class Trainer:
 
         self.D_scheduler = MultiStepLR(self.optimizer_D, [50, 80], gamma=0.2)
         self.G_scheduler = MultiStepLR(self.optimizer_G, [50, 80], gamma=0.2)
-
+        # todo: create the loss class
         self.loss = Loss()
 
     def train_one_epoch(self):
@@ -63,8 +58,9 @@ class Trainer:
                 loss_g_total.backward()
                 self.optimizer_G.step()
 
-        return
+        return loss_g, loss_d
 
+    #todo: implement
     def general_epoch_step(self, mode):
         ...
 
@@ -77,6 +73,7 @@ class Trainer:
             self.general_epoch_step("test")
 
     def compute_generator_loss(self, cloud_a, cloud_b, cloud_a_g, cloud_b_g, t_e, t_real):
+        # todo: implement losses
         # loss alignment
         l_abs = self.loss.emd(cloud_a, cloud_b_g) + self.loss.emd(cloud_b, cloud_b_g)
         # loss relative struction
