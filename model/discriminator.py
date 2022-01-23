@@ -36,8 +36,8 @@ class LinearLeakyReLU(nn.Module):
         return self.model(x)
 
 if __name__ == "__main__":
-    x = torch.rand((2, 256*3))
-    discriminator = Discriminator(in_features=256*3)
+    x = torch.rand((2, 1024*3))
+    discriminator = Discriminator(in_features=1024*3)
     output = discriminator(x)
     print("output shape is ", output.shape)
     assert output.shape == (2, 1)

@@ -23,7 +23,7 @@ It would also make sense to stay close to the coding style used in the exercises
 - implement [PDSAC](model/pdsac.py) (see section 3.3)
 - add forward function for [generator](model/generator.py) (should be done after all parts of generator are implemented to know all necessary parameters)
 - implement [discriminator neural network](model/discriminator.py) (see appendix section 1.1)
-- complete [training file](training/train_genreg.py) (see section 3.4 and Appendix section 1.2)
+- complete [training file](training/trainer.py) (see section 3.4 and Appendix section 1.2)
 - add visualization file(s) (no designated file/file folder yet)
 - run overfit successfully
 ### Experiments
