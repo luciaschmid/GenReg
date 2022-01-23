@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 
+
 class Discriminator(nn.Module):
     def __init__(self, in_features):
         super().__init__()
@@ -24,6 +25,7 @@ class Discriminator(nn.Module):
     def forward(self, x):
         return self.model(x)
 
+
 class LinearLeakyReLU(nn.Module):
     def __init__(self, in_features, out_features):
         super().__init__()
@@ -34,6 +36,7 @@ class LinearLeakyReLU(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
 
 if __name__ == "__main__":
     x = torch.rand((2, 1024*3))

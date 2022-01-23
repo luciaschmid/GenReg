@@ -5,6 +5,13 @@ This implementation is not the official code, it is community code for a univers
 
 For data as in the paper the datasets ModelNet40 [[2]](#2) and 7Scenes [[3]](#3) are used.
 
+# Used third parties
+For the dataloader for the 7Scenes dataset code from the [github implementation](https://github.com/XiaoshuiHuang/fmr)
+of the Feature-Metric Registration[[4]](#4) paper is used, as it is referenced in the GenReg paper.
+
+As pytorch does not offer an implementation of the earth mover distance (EMD), we used a third party implementation of [EMD
+for pytorch](https://github.com/daerduoCarey/PyTorchEMD) [[5]](#5).
+
 ## Proposed code of conduct
 If you are working on one of the ToDos create a branch with the same or similar name to the todo. When you finished 
 the task create a merge request and write in the telegram chat so that a team member reviews your code and completes the merge asap.
@@ -47,4 +54,14 @@ Proceedings of 28th IEEE Conference on Computer Vision and Pattern Recognition (
 <a id="3">[3]</a>
 Jamie Shotton, Ben Glocker, Christopher Zach, Shahram Izadi, Antonio Criminisi, Andrew Fitzgibbon.\
 Scene Coordinate Regression Forests for Camera Relocalization in RGB-D Images\
-Proc. Computer Vision and Pattern Recognition (CVPR) | June 2013	
+Proc. Computer Vision and Pattern Recognition (CVPR) | June 2013
+
+<a id="4">[4]</a>
+Xiaoshui Huang, Guofeng Mei, Jian Zhang.\
+Feature-Metric Registration: A Fast Semi-Supervised Approach for Robust Point Cloud Registration Without Correspondences\
+[ArXiv abs/2005.01014](https://arxiv.org/abs/2005.01014) (2020)
+
+<a id="5">[5]</a>
+Haoqiang Fan, Hao Su, Leonidas Guibas.\
+A Point Set Generation Network for 3D Object Reconstruction from a Single Image\
+[ArXiv abs/1612.00603](https://arxiv.org/abs/1612.00603) (2016)
