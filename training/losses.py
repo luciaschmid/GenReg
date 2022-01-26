@@ -1,14 +1,18 @@
 import torch
 import torch.nn as nn
 import torch.linalg as la
-from emd import earth_mover_distance
+from PyTorchEMD.emd import earth_mover_distance
 
+bce_loss = nn.BCEWithLogitsLoss()
+def calc_discriminator_loss(pred, label):
+    labels = torch.full((pred.size(0), 1), label, dtype=torch.float).to(pred.device)
+    return bce_loss(pred, labels)
 
-def calc_training_loss(pc1, pc2, apc1, apc2, real_o, real_t, fake_o, fake_t, transf_est, transf_gt):
+def calc_training_loss(pc1, pc2, apc1, apc2, real_o_a, fake_o_b, F, transf_est=None, transf_gt=None):
     training_loss = calc_absolute_loss(pc1, pc2, apc1, apc2) + calc_relative_loss(pc1, pc2, apc1, apc2) +\
-                    calc_cycle_consistency_loss(pc1, pc2, None, None) +\
-                    calc_adversarial_loss(real_o, real_t, fake_o, fake_t) * 0.01 +\
-                    calc_transformation_loss(transf_est, transf_gt)
+                    calc_cycle_consistency_loss(pc1, apc1, pc2, apc2, F) +\
+                    calc_adversarial_loss(real_o_a, fake_o_b) * 0.01
+                    # + calc_transformation_loss(transf_est, transf_gt)
     return training_loss
 
 
@@ -22,7 +26,7 @@ def calc_absolute_loss(pointcloud_a, pointcloud_b, aligned_pointcloud_a, aligned
 
     absolute_loss = earth_mover_distance(pointcloud_a, aligned_pointcloud_b, transpose=use_transpose) +\
         earth_mover_distance(pointcloud_b, aligned_pointcloud_a, transpose=use_transpose)
-    return absolute_loss
+    return absolute_loss.mean()
 
 
 def calc_edge_set(point_cloud):
@@ -48,19 +52,20 @@ def calc_relative_loss(pointcloud_a, pointcloud_b, aligned_pointcloud_a, aligned
     edge_aligned_b = calc_edge_set(aligned_pointcloud_b)
 
     # calculate relative loss
-    relative_loss = nn.L1Loss(edge_a, edge_aligned_a) + nn.L1Loss(edge_b, edge_aligned_b)
+    relative_loss = nn.L1Loss()(edge_a, edge_aligned_a) + nn.L1Loss()(edge_b, edge_aligned_b)
     return relative_loss
 
 
-def calc_cycle_consistency_loss(pointcloud_a, pointcloud_b, F, G):
+def calc_cycle_consistency_loss(cloud_a, cloud_a_fake, cloud_b, cloud_b_fake, F):
     # ToDO add cycle consistency loss
-    return 10
+    re_cloud_a, re_cloud_b = F(cloud_a_fake, cloud_b_fake)
+    l = earth_mover_distance(re_cloud_a, cloud_a) + earth_mover_distance(re_cloud_b, cloud_b)
+    return l.mean()
 
 
-def calc_adversarial_loss(real_output, real_truth, fake_output, fake_truth):
-    criterion = nn.BCELoss()
-    real_loss = criterion(real_output, real_truth)
-    fake_loss = criterion(fake_output, fake_truth)
+def calc_adversarial_loss(real_output, fake_output):
+    real_loss = calc_discriminator_loss(real_output, True)
+    fake_loss = calc_discriminator_loss(fake_output, False)
     return real_loss + fake_loss
 
 
@@ -71,9 +76,14 @@ def calc_transformation_loss(transformation_estimated, transformation_ground_tru
 
 
 if __name__ == "__main__":
-    p1 = torch.rand(1024, 3).to(device='cuda')
-    p2 = torch.rand(1024, 3).to(device='cuda')
+    p1 = torch.rand(2, 1024, 3).to(device='cuda')
+    p2 = torch.rand(2, 1024, 3).to(device='cuda')
     emd_p1_p2 = earth_mover_distance(p1, p2, transpose=False)
     print(f'EMD is {emd_p1_p2}')
     edge_set_p1 = calc_edge_set(p1)
     print(f'Edge set of p1 is {edge_set_p1} and shape {edge_set_p1.shape}')
+
+    output = torch.rand(2, 1)
+    label = False
+    d_loss = calc_discriminator_loss(output, label)
+    print("d loss is ", d_loss)
