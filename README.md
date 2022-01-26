@@ -12,6 +12,9 @@ of the Feature-Metric Registration[[4]](#4) paper is used, as it is referenced i
 As pytorch does not offer an implementation of the earth mover distance (EMD), we used a third party implementation of [EMD
 for pytorch](https://github.com/daerduoCarey/PyTorchEMD) [[5]](#5).
 
+PyTorchEMD is add as a submodule. Please use the following command to get it after cloning this project:
+`git submodule update --init --recursive`
+
 ## Proposed code of conduct
 If you are working on one of the ToDos create a branch with the same or similar name to the todo. When you finished 
 the task create a merge request and write in the telegram chat so that a team member reviews your code and completes the merge asap.

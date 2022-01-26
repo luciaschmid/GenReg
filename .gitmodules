@@ -1,0 +1,3 @@
+[submodule "PyTorchEMD"]
+	path = PyTorchEMD
+	url = https://github.com/daerduoCarey/PyTorchEMD.git
