@@ -1,0 +1,8 @@
+trainer_params:
+  lr_D: 1e-4
+  lr_G: 1e-4
+  n_epochs: 100
+  patience: 10
+dataset_params:
+  select: "ModelNet40"
+  batch_size: 4

@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 
 class Decoder(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels=256):
         super().__init__()
         self.model = nn.Sequential(
             ConvGELU(in_channels, 256),

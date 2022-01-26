@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 class ModelNet40(torch.utils.data.Dataset):
-    dataset_path = "data/ModelNet40"
+    dataset_path = os.path.join(os.getcwd(), "data/ModelNet40")
 
     def __init__(self,split):
         super().__init__()
@@ -41,8 +41,8 @@ class ModelNet40(torch.utils.data.Dataset):
         input_v, output_v = self.get_object_files(classname, split, off_file)
         
         return {
-            "input": input_v,
-            "output": output_v,
+            "input": input_v.T,
+            "output": output_v.T,
             "class": classname
         }
 

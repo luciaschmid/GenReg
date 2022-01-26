@@ -3,7 +3,7 @@ import torch
 
 
 class Discriminator(nn.Module):
-    def __init__(self, in_features):
+    def __init__(self, in_features=1024*3):
         super().__init__()
         '''
         From Appendix Section 1.1
@@ -35,6 +35,7 @@ class LinearLeakyReLU(nn.Module):
         )
 
     def forward(self, x):
+        x = x.reshape((x.shape[0], -1))
         return self.model(x)
 
 

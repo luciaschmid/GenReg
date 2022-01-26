@@ -11,7 +11,7 @@ def get_graph_feature(x, k=20):
     :param k: number of neighbors
     :return: constructed graph
     """
-
+    device = x.device
     batch_size = x.size(0)
     num_points = x.size(2)
     x = x.view(batch_size, -1, num_points)
@@ -21,8 +21,6 @@ def get_graph_feature(x, k=20):
     pairwise_distance = -xx - inner - xx.transpose(2, 1)
 
     idx = pairwise_distance.topk(k=k, dim=-1)[1]  # (batch_size, num_points, k)
-
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     idx_base = torch.arange(0, batch_size, device=device).view(-1, 1, 1) * num_points
 
@@ -40,7 +38,7 @@ def get_graph_feature(x, k=20):
 
     feature = torch.cat((feature - x, x), dim=3).permute(0, 3, 1, 2).contiguous()
 
-    return feature
+    return feature.to(device)
 
 def _axis_angle_rotation(axis: str, angle: torch.Tensor) -> torch.Tensor:
     """
@@ -154,11 +152,11 @@ class TNet(nn.Module):
         rot_a = euler_angles_to_matrix(params_a[:, :3, 0], "ZYX")
         rot_b = euler_angles_to_matrix(params_b[:, :3, 0], "ZYX")
         t_a, t_b = params_a[:, 3:, 0], params_b[:, 3:, 0]
-        trans_a, trans_b = get_trans_matrix(rot_a, t_a), get_trans_matrix(rot_b, t_b)
+        trans_a, trans_b = get_trans_matrix(rot_a, t_a).to(cloud_a.device), get_trans_matrix(rot_b, t_b).to(cloud_b.device)
 
         # homogeneous coordinates for point cloud A
-        cloud_a_homo = nn.functional.pad(cloud_a, (0,0,0,1), "constant", 1.0)
-        cloud_b_homo = nn.functional.pad(cloud_b, (0,0,0,1), "constant", 1.0)
+        cloud_a_homo = nn.functional.pad(cloud_a, (0,0,0,1), "constant", 1.0).to(cloud_a.device)
+        cloud_b_homo = nn.functional.pad(cloud_b, (0,0,0,1), "constant", 1.0).to(cloud_b.device)
 
         cloud_a_transformed = torch.einsum('bfg,bgn->bfn', trans_a, cloud_a_homo)
         cloud_b_transformed = torch.einsum('bfg,bgn->bfn', trans_b, cloud_b_homo)
@@ -195,6 +193,7 @@ class GCNN(nn.Module):  # Graph convolution neural network
 
     def forward(self, x):
         x = get_graph_feature(x, k=self.k)
+
         x = self.conv1(x)
         x1 = x.max(dim=-1, keepdim=False)[0]
 
@@ -265,6 +264,7 @@ class PointMixer(nn.Module):
 
     def forward(self, cloud_a, cloud_b):
         cloud_a_transformed, cloud_b_transformed = self.tnet(cloud_a, cloud_b)
+
         graph_a = self.gcnn(cloud_a_transformed)
         graph_b = self.gcnn(cloud_b_transformed)
 
