@@ -16,7 +16,7 @@ datasets = {"ModelNet40": ModelNet40DataModule,
 
 def get_callbacks(params):
     early_stop_callback = pl.callbacks.EarlyStopping(
-        monitor="val_loss",
+        monitor="val_loss_g",
         patience=params["patience"],
         strict=True,
         mode="min"
@@ -24,7 +24,7 @@ def get_callbacks(params):
 
     cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        monitor="val_loss",
+        monitor="val_loss_g",
         dirpath=os.path.join(cwd, "build", "checkpoints"),
         filename=params["experiment_name"],
         save_top_k=1,

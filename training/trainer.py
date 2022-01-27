@@ -61,7 +61,7 @@ class GenReg_Trainer(LightningModule):
             if batch_id % 5 == 0 or mode != "train":
                 # train generator every 5 steps
                 loss_g_total = self.compute_generator_loss(cloud_a, cloud_b, cloud_a_g, cloud_b_g)
-                tqdm_dict = {"g_loss": loss_g_total}
+                tqdm_dict = {"loss_g": loss_g_total}
                 output = OrderedDict({"loss": loss_g_total, "progress_bar": tqdm_dict, "log": tqdm_dict})
                 return output
 
@@ -84,21 +84,33 @@ class GenReg_Trainer(LightningModule):
         # average over all batches aggregated during one epoch
         logger = False if mode == 'test' else True
 
-        losses = []
+        losses_g = []
+        losses_d = []
         for x in outputs:
             if isinstance(x, dict):
-                losses.append(x["loss"])
+                if "loss_g" in list(x["progress_bar"].keys()):
+                    losses_g.append(x["progress_bar"]["loss_g"])
+                if "loss_d" in list(x["progress_bar"].keys()):
+                    losses_d.append(x["progress_bar"]["loss_d"])
             else:
                 for x_i in x:
-                    losses.append(x_i["loss"])
+                    if "loss_g" in list(x_i["progress_bar"].keys()):
+                        losses_g.append(x_i["progress_bar"]["loss_g"])
+                    if "loss_d" in list(x_i["progress_bar"].keys()):
+                        losses_d.append(x_i["progress_bar"]["loss_d"])
 
-        avg_loss = torch.stack(losses).mean()
+        if len(losses_g) > 0:
+            avg_loss_g = torch.stack(losses_g).mean()
+            self.log(f'{mode}_loss_g', avg_loss_g, logger=False, prog_bar=True)
+            if logger and self.logger is not None:
+                self.logger.experiment.add_scalar(f'{mode}/{mode}_loss_g', avg_loss_g, self.current_epoch)
 
-        self.log(f'{mode}_loss', avg_loss, logger=False, prog_bar=True)
-        if logger and self.logger is not None:
-            self.logger.experiment.add_scalar(f'{mode}/{mode}_loss', avg_loss, self.current_epoch)
+        if len(losses_d) > 0:
+            avg_loss_d = torch.stack(losses_d).mean()
+            self.log(f'{mode}_loss_d', avg_loss_d, logger=False, prog_bar=True)
+            if logger and self.logger is not None:
+                self.logger.experiment.add_scalar(f'{mode}/{mode}_loss_d', avg_loss_d, self.current_epoch)
 
-        return avg_loss
 
     def training_epoch_end(self, outputs):
         self.general_epoch_end(outputs, 'train')
