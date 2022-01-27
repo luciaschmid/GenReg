@@ -43,6 +43,14 @@ It would also make sense to stay close to the coding style used in the exercises
 - 4.5
 - 4.6
 
+## Instructions
+To view tensorboard, please use the following command:
+
+`tensorboard --logdir build/log`
+
+
+Checkpoints are stored in build/checkpoints
+
 ## References
 <a id="1">[1]</a> 
 Xiaoshui Huang, Zongyi Xu, Guofeng Mei, Sheng Li, Jian Zhang, Yifan Zuo, Yucheng Wang.\
