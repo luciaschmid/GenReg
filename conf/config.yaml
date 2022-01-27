@@ -3,6 +3,9 @@ trainer_params:
   lr_G: 1e-4
   n_epochs: 100
   patience: 10
+callback_params:
+  experiment_name: GenReg_overfitting_{epoch:02d}-{val_loss:.4f}
+  patience: 10
 dataset_params:
   select: "ModelNet40"
   batch_size: 4

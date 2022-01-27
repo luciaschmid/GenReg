@@ -2,6 +2,10 @@ from pathlib import Path
 import torch
 import os
 import numpy as np
+import pytorch_lightning as pl
+from torch.utils.data import DataLoader
+
+NUM_WORKERS = int(os.cpu_count() / 2)
 
 class ModelNet40(torch.utils.data.Dataset):
     dataset_path = os.path.join(os.getcwd(), "data/ModelNet40")
@@ -34,6 +38,7 @@ class ModelNet40(torch.utils.data.Dataset):
                 for file in files:
                     self.items.append(cls+"/"+split+"/"+file)
         
+        self.items = self.items[:100]
 
     def __getitem__(self, index):
         # TODO
@@ -113,7 +118,7 @@ class ModelNet40(torch.utils.data.Dataset):
         
         #random sampling 1024 vertices
         l = vertices.shape[0]
-        indices = np.random.choice([i for i in range(l)],1024,False)
+        indices = np.random.choice([i for i in range(l)],1024,True)
         input_v = ModelNet40.normalizeData(vertices[indices,:])
         
         #random initialization of 6DoF
@@ -130,3 +135,35 @@ class ModelNet40(torch.utils.data.Dataset):
         return input_v, output_v
     
     
+class ModelNet40DataModule(pl.LightningDataModule):
+    def __init__(self, batch_size, num_workers: int = NUM_WORKERS):
+        super().__init__()
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+
+    def setup(self, stage=None):
+        self.train_dataset = ModelNet40('train')
+        self.test_dataset = ModelNet40('test')
+        self.cross_dataset = ModelNet40('cross-category')
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self.cross_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False)
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False)
