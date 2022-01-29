@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 
 NUM_WORKERS = int(os.cpu_count() / 2)
 
+
 class ModelNet40(torch.utils.data.Dataset):
     dataset_path = os.path.join(os.getcwd(), "data/ModelNet40")
 
@@ -95,11 +96,9 @@ class ModelNet40(torch.utils.data.Dataset):
         op = Rz@Ry@Rx@mat.T
         
         a = op + translate
-        
-        
+
         return a.T
-        
-    
+
     def get_object_files(self,classname,split,off_file):
         #reading data file
         f = open(self.dataset_path+"/{}/{}/{}".format(classname,split,off_file),"r")

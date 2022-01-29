@@ -111,7 +111,6 @@ class GenReg_Trainer(LightningModule):
             if logger and self.logger is not None:
                 self.logger.experiment.add_scalar(f'{mode}/{mode}_loss_d', avg_loss_d, self.current_epoch)
 
-
     def training_epoch_end(self, outputs):
         self.general_epoch_end(outputs, 'train')
 

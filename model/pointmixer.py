@@ -272,6 +272,7 @@ class PointMixer(nn.Module):
         mixer_b = self.mixer_layer_2(self.mixer_layer_1(graph_b))
         return mixer_a, mixer_b
 
+
 if __name__ == "__main__":
     cloud_a, cloud_b = torch.rand(2, 3, 1024), torch.rand(2, 3, 1024)
     pm = PointMixer(two_pooling=False)

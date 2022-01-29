@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.linalg as la
-from PyTorchEMD.emd import earth_mover_distance
+from training.emd import earth_mover_distance
 
 bce_loss = nn.BCEWithLogitsLoss()
 def calc_discriminator_loss(pred, label):
