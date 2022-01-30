@@ -10,7 +10,7 @@ from model.discriminator import Discriminator
 from training import losses
 
 
-class GenReg_Trainer(LightningModule):
+class GenReg(LightningModule):
     def __init__(self, params):
         super().__init__()
 
@@ -19,10 +19,10 @@ class GenReg_Trainer(LightningModule):
 
         self.G_model = Generator()
         # G_model.apply(xavier_init)
-        self.G_model = nn.DataParallel(self.G_model).to(self.device)
+        self.G_model = nn.DataParallel(self.G_model)
         self.D_model = Discriminator()
         # D_model.apply(xavier_init)
-        self.D_model = torch.nn.DataParallel(self.D_model).to(self.device)
+        self.D_model = torch.nn.DataParallel(self.D_model)
 
         # self.G_model.train(), self.D_model.train()
 
@@ -36,7 +36,7 @@ class GenReg_Trainer(LightningModule):
         return self.G_model(cloud_a, cloud_b)
 
     def general_step(self, batch, batch_id, optimizer_idx, mode):
-        cloud_a, cloud_b = batch["input"].float().to(self.device), batch["output"].float().to(self.device)
+        cloud_a, cloud_b = batch["pointcloud_a"].float(), batch["pointcloud_b"].float()
         cloud_a_g, cloud_b_g = self.G_model(cloud_a, cloud_b)
 
         # train discriminator
@@ -71,11 +71,6 @@ class GenReg_Trainer(LightningModule):
         self.G_model.train()
         self.D_model.train()
         return self.general_step(batch, batch_id, optimizer_idx, "train")
-
-    def validation_step(self, batch, batch_id, mode='val'):
-        self.G_model.eval()
-        self.D_model.eval()
-        return self.general_step(batch, batch_id, 0, mode)
 
     def test_step(self, batch, batch_idx):
         return self.validation_step(batch, batch_idx, mode="test")
@@ -126,7 +121,7 @@ class GenReg_Trainer(LightningModule):
     def compute_generator_loss(self, cloud_a, cloud_b, cloud_a_g, cloud_b_g):
 
         loss_g_total = losses.calc_training_loss(cloud_a, cloud_b, cloud_a_g, cloud_b_g,
-                                                         self.D_model(cloud_a), self.D_model(cloud_b_g), self.G_model)
+                                                 self.D_model(cloud_a), self.D_model(cloud_b_g), self.G_model)
         return loss_g_total
 
     def configure_optimizers(self):
@@ -137,3 +132,13 @@ class GenReg_Trainer(LightningModule):
         G_scheduler = MultiStepLR(optimizer_G, [50, 80], gamma=0.2)
 
         return [optimizer_G, optimizer_D], [G_scheduler, D_scheduler]
+
+
+class GenRegVal(GenReg):
+    def __init__(self):
+        super(GenRegVal, self).__init__()
+
+    def validation_step(self, batch, batch_id, mode='val'):
+        self.G_model.eval()
+        self.D_model.eval()
+        return self.general_step(batch, batch_id, 0, mode)

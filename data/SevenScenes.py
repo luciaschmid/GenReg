@@ -5,8 +5,13 @@ import os
 import glob
 import data.transforms as transforms
 import data.mesh as mesh
+import pytorch_lightning as pl
+from torch.utils.data import DataLoader
 
-# Code adapted from https://github.com/XiaoshuiHuang/fmr/blob/master/data/dataset.py, as GenReg uses very similar
+
+NUM_WORKERS = int(os.cpu_count() / 2)
+
+# Some code adapted from https://github.com/XiaoshuiHuang/fmr/blob/master/data/dataset.py, as GenReg uses very similar
 # 7 Scenes dataset setup as FMR
 
 
@@ -47,8 +52,12 @@ class SevenScenes(torch.utils.data.Dataset):
         pointcloud_b = self.rigid_transform(pointcloud_a)
         transformation_matrix = self.rigid_transform.transformation_matrix
 
-        return {'pointcloud_a': pointcloud_a, 'pointcloud_b': pointcloud_b,
-                'transformation_matrix': transformation_matrix}
+        pointcloud_a = pointcloud_a.permute(1, 0)
+        pointcloud_b = pointcloud_b.permute(1, 0)
+
+        return {'pointcloud_a': pointcloud_a,
+                'pointcloud_b': pointcloud_b,
+                'transformation_matrix': transformation_matrix, 'class': self.scenes[smpl_idx]}
 
     def __len__(self):
         return len(self.samples)
@@ -79,3 +88,28 @@ class SevenScenes(torch.utils.data.Dataset):
                 samples.append(item)
         return samples
 
+
+class SevenScenesDataModule(pl.LightningDataModule):
+    def __init__(self, batch_size, num_workers: int = NUM_WORKERS):
+        super().__init__()
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+
+    def setup(self):
+        self.train_dataset = SevenScenes('train')
+        self.test_dataset = SevenScenes('test')
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False)

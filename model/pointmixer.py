@@ -40,6 +40,7 @@ def get_graph_feature(x, k=20):
 
     return feature.to(device)
 
+
 def _axis_angle_rotation(axis: str, angle: torch.Tensor) -> torch.Tensor:
     """
     Return the rotation matrices for one of the rotations about an axis
@@ -104,6 +105,7 @@ def get_trans_matrix(rot, t):
     trans[:, 3, 3] = 1
     return trans
 
+
 class TNet(nn.Module):
     def __init__(self, two_pooling=True):
         super().__init__()
@@ -139,14 +141,14 @@ class TNet(nn.Module):
         assert cloud_b.size(dim=1) == 3, 'second dimension of point cloud should be # of channels, therefore 3'
 
         # First: MLP to extract local features
-        cloud_a_feat = self.mlp1(cloud_a) # [b, 1024, 1024]
+        cloud_a_feat = self.mlp1(cloud_a)  # [b, 1024, 1024]
         cloud_b_feat = self.mlp1(cloud_b)
 
         # Second: max pooling is applied to get the global features
         # Third: the interaction module concatenates the both global features, and uses the concatenated
         # feature into a three-layer MLP to estimate the six transformation parameters
-        fusion1, fusion2 = self.feat_interaction(cloud_a_feat, cloud_b_feat) # [b, 2048, 1024]
-        params_a, params_b = symfn_max(self.mlp2(fusion1)), symfn_max(self.mlp2(fusion2)) #[b, 6, 1]
+        fusion1, fusion2 = self.feat_interaction(cloud_a_feat, cloud_b_feat)  # [b, 2048, 1024]
+        params_a, params_b = symfn_max(self.mlp2(fusion1)), symfn_max(self.mlp2(fusion2))  # [b, 6, 1]
 
         # get rigid transformation matrix
         rot_a = euler_angles_to_matrix(params_a[:, :3, 0], "ZYX")

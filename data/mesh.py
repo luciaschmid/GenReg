@@ -9,8 +9,6 @@ import matplotlib.pyplot
 
 # used to read ply files
 from plyfile import PlyData
-import open3d as o3d
-import numpy as np
 
 
 class Mesh:
@@ -109,123 +107,6 @@ class Mesh:
         return self
 
 
-def offread_uniformed(filepath, sampled_pt_num=1024):
-    """ read OFF mesh file and uniformly sample points on the mesh. """
-    mesh = Mesh()
-    input = o3d.io.read_triangle_mesh(filepath)
-    pointCloud = input.sample_points_uniformly(sampled_pt_num)
-    points = np.asarray(pointCloud.points)
-    pts = tuple(map(tuple, points))
-    mesh._vertices = pts
-
-    return mesh
-
-
-def offread(filepath, points_only=True):
-    """ read Geomview OFF file. """
-    with open(filepath, 'r') as fin:
-        mesh, fixme = _load_off(fin, points_only)
-    if fixme:
-        _fix_modelnet_broken_off(filepath)
-    return mesh
-
-
-def _load_off(fin, points_only):
-    """ read Geomview OFF file. """
-    mesh = Mesh()
-
-    fixme = False
-    sig = fin.readline().strip()
-    if sig == 'OFF':
-        line = fin.readline().strip()
-        num_verts, num_faces, num_edges = tuple([int(s) for s in line.split(' ')])
-    elif sig[0:3] == 'OFF':  # ...broken data in ModelNet (missing '\n')...
-        line = sig[3:]
-        num_verts, num_faces, num_edges = tuple([int(s) for s in line.split(' ')])
-        fixme = True
-    else:
-        raise RuntimeError('unknown format')
-
-    for v in range(num_verts):
-        vp = tuple(float(s) for s in fin.readline().strip().split(' '))
-        mesh._vertices.append(vp)
-
-    if points_only:
-        return mesh, fixme
-
-    for f in range(num_faces):
-        fc = tuple([int(s) for s in fin.readline().strip().split(' ')][1:])
-        mesh._faces.append(fc)
-
-    return mesh, fixme
-
-
-def _fix_modelnet_broken_off(filepath):
-    oldfile = '{}.orig'.format(filepath)
-    os.rename(filepath, oldfile)
-    with open(oldfile, 'r') as fin:
-        with open(filepath, 'w') as fout:
-            sig = fin.readline().strip()
-            line = sig[3:]
-            print('OFF', file=fout)
-            print(line, file=fout)
-            for line in fin:
-                print(line.strip(), file=fout)
-
-
-def objread(filepath, points_only=True):
-    """Loads a Wavefront OBJ file. """
-    _vertices = []
-    _normals = []
-    _texcoords = []
-    _faces = []
-    _mtl_name = None
-
-    material = None
-    for line in open(filepath, "r"):
-        if line.startswith('#'): continue
-        values = line.split()
-        if not values: continue
-        if values[0] == 'v':
-            v = tuple(map(float, values[1:4]))
-            _vertices.append(v)
-        elif values[0] == 'vn':
-            v = tuple(map(float, values[1:4]))
-            _normals.append(v)
-        elif values[0] == 'vt':
-            _texcoords.append(tuple(map(float, values[1:3])))
-        elif values[0] in ('usemtl', 'usemat'):
-            material = values[1]
-        elif values[0] == 'mtllib':
-            _mtl_name = values[1]
-        elif values[0] == 'f':
-            face_ = []
-            texcoords_ = []
-            norms_ = []
-            for v in values[1:]:
-                w = v.split('/')
-                face_.append(int(w[0]) - 1)
-                if len(w) >= 2 and len(w[1]) > 0:
-                    texcoords_.append(int(w[1]) - 1)
-                else:
-                    texcoords_.append(-1)
-                if len(w) >= 3 and len(w[2]) > 0:
-                    norms_.append(int(w[2]) - 1)
-                else:
-                    norms_.append(-1)
-            # _faces.append((face_, norms_, texcoords_, material))
-            _faces.append(face_)
-
-    mesh = Mesh()
-    mesh._vertices = _vertices
-    if points_only:
-        return mesh
-
-    mesh._faces = _faces
-
-    return mesh
-
-
 def plyread(filepath, points_only=True):
     # read binary ply file and return [x, y, z] array
     data = PlyData.read(filepath)
@@ -242,42 +123,5 @@ def plyread(filepath, points_only=True):
 
     return mesh
 
-
-if __name__ == '__main__':
-    def test1():
-        mesh = objread('model_normalized.obj', points_only=False)
-        # mesh.on_unit_sphere()
-        mesh.rot_x()
-        mesh.plot(c='m')
-        matplotlib.pyplot.show()
-
-
-    def test2():
-        mesh = plyread('1.ply', points_only=True)
-        # mesh.on_unit_sphere()
-        mesh.rot_x()
-        mesh.plot(c='m')
-        matplotlib.pyplot.show()
-
-
-    def make_open3d_point_cloud(xyz, color=None):
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(xyz)
-        if color is not None:
-            if len(color) != len(xyz):
-                color = np.tile(color, (len(xyz), 1))
-            pcd.colors = o3d.utility.Vector3dVector(color)
-        return pcd
-
-    def test3():
-        mesh = offread("../data/bed.off",False)
-        mesh = offread_uniformed("../data/bed.off")
-        points = mesh.vertex_array
-        p1 = np.asarray(points)
-        pcd = make_open3d_point_cloud(p1)
-        o3d.visualization.draw_geometries([pcd])
-
-
-    test3()
 
 # EOF
