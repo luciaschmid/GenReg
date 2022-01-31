@@ -140,6 +140,7 @@ class TNet(nn.Module):
         assert cloud_a.size(dim=1) == 3, 'second dimension of point cloud should be # of channels, therefore 3'
         assert cloud_b.size(dim=1) == 3, 'second dimension of point cloud should be # of channels, therefore 3'
 
+        print(torch.cuda.memory_summary(device=cloud_a.device))
         # First: MLP to extract local features
         cloud_a_feat = self.mlp1(cloud_a)  # [b, 1024, 1024]
         cloud_b_feat = self.mlp1(cloud_b)
@@ -194,6 +195,7 @@ class GCNN(nn.Module):  # Graph convolution neural network
                                    nn.LeakyReLU(negative_slope=0.2))
 
     def forward(self, x):
+        print(torch.cuda.memory_summary(x.device))
         x = get_graph_feature(x, k=self.k)
 
         x = self.conv1(x)

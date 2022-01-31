@@ -57,7 +57,8 @@ class SevenScenes(torch.utils.data.Dataset):
 
         return {'pointcloud_a': pointcloud_a,
                 'pointcloud_b': pointcloud_b,
-                'transformation_matrix': transformation_matrix, 'class': self.scenes[smpl_idx]}
+                'transformation_matrix': transformation_matrix,
+                'class': self.scenes[smpl_idx]}
 
     def __len__(self):
         return len(self.samples)

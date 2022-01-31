@@ -41,11 +41,12 @@ class ModelNet40(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         classname, split, off_file = self.items[index].split("/")
-        input_v, output_v = self.get_object_files(classname, split, off_file)
+        input_v, output_v, transformation_matrix = self.get_object_files(classname, split, off_file)
         
         return {
             "pointcloud_a": input_v.T,
             "pointcloud_b": output_v.T,
+            "transformation_matrix": transformation_matrix,
             "class": classname
         }
 
@@ -92,7 +93,10 @@ class ModelNet40(torch.utils.data.Dataset):
         
         a = op + translate
 
-        return a.T
+        transformation_matrix = np.concatenate((np.concatenate((Rz@Ry@Rx, translate), axis=1),
+                                                np.array([[0, 0, 0, 1]])), axis=0)
+
+        return a.T, transformation_matrix
 
     def get_object_files(self, classname, split, off_file):
         # reading data file
@@ -123,9 +127,9 @@ class ModelNet40(torch.utils.data.Dataset):
         ty = np.round(np.random.uniform(0, 0.8), 3)  # y-axis Translation
         tz = np.round(np.random.uniform(0, 0.8), 3)  # z-axis Translation
         
-        output_v = ModelNet40.rigid_transform(input_v.copy(), x_deg, y_deg, z_deg, tx, ty, tz)
+        output_v, transformation_matrix = ModelNet40.rigid_transform(input_v.copy(), x_deg, y_deg, z_deg, tx, ty, tz)
         
-        return input_v, output_v
+        return input_v, output_v, transformation_matrix
     
     
 class ModelNet40DataModule(pl.LightningDataModule):
