@@ -5,13 +5,14 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 import torch
 
-from training.trainer import GenReg_Trainer
+from training.trainer import GenReg
 from data.ModelNet40 import ModelNet40DataModule
 # todo add data module to SevenScenes
 from data.SevenScenes import SevenScenes
 
 datasets = {"ModelNet40": ModelNet40DataModule,
             "SevenScenes": SevenScenes, }
+cwd = os.getcwd()
 
 
 def get_callbacks(params):
@@ -22,7 +23,6 @@ def get_callbacks(params):
         mode="min"
     )
 
-    cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         monitor="val_loss_g",
         dirpath=os.path.join(cwd, "build", "checkpoints"),
@@ -57,8 +57,6 @@ def train(config):
     print(len(dataloader.train_dataloader()), len(dataloader.val_dataloader()), len(dataloader.test_dataloader()))
 
     callbacks = get_callbacks(config["callback_params"])
-
-    cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))
     print(os.path.join(cwd, "build", "log"))
 
     stats_logger = TensorBoardLogger(
@@ -66,7 +64,7 @@ def train(config):
         name=config["callback_params"]["experiment_name"]
     )
 
-    model_trainer = GenReg_Trainer(trainer_params)
+    model_trainer = GenReg(trainer_params)
     trainer = pl.Trainer(check_val_every_n_epoch=1,
                          fast_dev_run=False,
                          max_epochs=trainer_params["n_epochs"],
@@ -75,7 +73,9 @@ def train(config):
                          callbacks=callbacks,
                          )
     trainer.fit(model_trainer, dataloader.train_dataloader(), dataloader.val_dataloader())
+    return model_trainer
 
 
 if __name__ == "__main__":
+    cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))
     train()

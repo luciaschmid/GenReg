@@ -37,7 +37,7 @@ class ModelNet40(torch.utils.data.Dataset):
                 for file in files:
                     self.items.append(cls+"/"+split+"/"+file)
         
-        # self.items = self.items[:100]
+        self.items = self.items
 
     def __getitem__(self, index):
         classname, split, off_file = self.items[index].split("/")
