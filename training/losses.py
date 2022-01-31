@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.linalg as la
-from training.emd import earth_mover_distance
+from PyTorchEMD.emd import earth_mover_distance
 
 bce_loss = nn.BCEWithLogitsLoss()
 def calc_discriminator_loss(pred, label):
@@ -9,9 +9,9 @@ def calc_discriminator_loss(pred, label):
     return bce_loss(pred, labels)
 
 def calc_training_loss(pc1, pc2, apc1, apc2, real_o_a, fake_o_b, F, transf_est=None, transf_gt=None):
-    training_loss = calc_absolute_loss(pc1, pc2, apc1, apc2) + calc_relative_loss(pc1, pc2, apc1, apc2) +\
-                    calc_cycle_consistency_loss(pc1, apc1, pc2, apc2, F) +\
-                    calc_adversarial_loss(real_o_a, fake_o_b) * 0.01
+    training_loss = calc_absolute_loss(pc1, pc2, apc1, apc2) + calc_relative_loss(pc1, pc2, apc1, apc2) + \
+                    calc_adversarial_loss(real_o_a, fake_o_b) * 0.01 +\
+                    calc_cycle_consistency_loss(pc1, apc1, pc2, apc2, F)
                     # + calc_transformation_loss(transf_est, transf_gt)
     return training_loss
 
@@ -26,6 +26,7 @@ def calc_absolute_loss(pointcloud_a, pointcloud_b, aligned_pointcloud_a, aligned
 
     absolute_loss = earth_mover_distance(pointcloud_a, aligned_pointcloud_b, transpose=use_transpose) +\
         earth_mover_distance(pointcloud_b, aligned_pointcloud_a, transpose=use_transpose)
+    # print("abs loss", absolute_loss)
     return absolute_loss.mean()
 
 
@@ -53,20 +54,25 @@ def calc_relative_loss(pointcloud_a, pointcloud_b, aligned_pointcloud_a, aligned
 
     # calculate relative loss
     relative_loss = nn.L1Loss()(edge_a, edge_aligned_a) + nn.L1Loss()(edge_b, edge_aligned_b)
+    # print("rel loss", relative_loss)
     return relative_loss
 
 
 def calc_cycle_consistency_loss(cloud_a, cloud_a_fake, cloud_b, cloud_b_fake, F):
     # ToDO add cycle consistency loss
     re_cloud_a, re_cloud_b = F(cloud_a_fake, cloud_b_fake)
-    l = earth_mover_distance(re_cloud_a, cloud_a) + earth_mover_distance(re_cloud_b, cloud_b)
-    return l.mean()
+    l = earth_mover_distance(re_cloud_a, cloud_a, transpose=True) + earth_mover_distance(re_cloud_b, cloud_b, transpose=True)
+    l = l.mean()
+    # print("cyc loss", l)
+    return l
 
 
 def calc_adversarial_loss(real_output, fake_output):
     real_loss = calc_discriminator_loss(real_output, True)
     fake_loss = calc_discriminator_loss(fake_output, False)
-    return real_loss + fake_loss
+    adv_loss = real_loss + fake_loss
+    # print("adv loss", adv_loss)
+    return adv_loss
 
 
 def calc_transformation_loss(transformation_estimated, transformation_ground_truth):

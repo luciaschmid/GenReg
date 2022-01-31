@@ -128,15 +128,10 @@ class GenReg(LightningModule):
         optimizer_D = torch.optim.Adam(self.D_model.parameters(), lr=self.params["lr_D"], betas=(0.9, 0.999))
         optimizer_G = torch.optim.Adam(self.G_model.parameters(), lr=self.params["lr_G"], betas=(0.9, 0.999))
 
-        D_scheduler = MultiStepLR(optimizer_D, [50, 80], gamma=0.2)
-        G_scheduler = MultiStepLR(optimizer_G, [50, 80], gamma=0.2)
+        D_scheduler = MultiStepLR(optimizer_D, [500], gamma=0.2)
+        G_scheduler = MultiStepLR(optimizer_G, [500], gamma=0.2)
 
         return [optimizer_G, optimizer_D], [G_scheduler, D_scheduler]
-
-
-class GenRegVal(GenReg):
-    def __init__(self):
-        super(GenRegVal, self).__init__()
 
     def validation_step(self, batch, batch_id, mode='val'):
         self.G_model.eval()
