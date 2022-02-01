@@ -34,7 +34,7 @@ def get_callbacks(params):
     lr_monitor = pl.callbacks.LearningRateMonitor()
 
     return [
-        # early_stop_callback,
+        early_stop_callback,
         checkpoint_callback,
         lr_monitor,
     ]
