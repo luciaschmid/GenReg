@@ -17,14 +17,14 @@ cwd = os.getcwd()
 
 def get_callbacks(params):
     early_stop_callback = pl.callbacks.EarlyStopping(
-        monitor="val_loss_g",
+        monitor=params["monitor"],
         patience=params["patience"],
         strict=True,
         mode="min"
     )
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        monitor="val_loss_g",
+        monitor=params["monitor"],
         dirpath=os.path.join(cwd, "build", "checkpoints"),
         filename=params["experiment_name"],
         save_top_k=1,
@@ -34,7 +34,7 @@ def get_callbacks(params):
     lr_monitor = pl.callbacks.LearningRateMonitor()
 
     return [
-        early_stop_callback,
+        # early_stop_callback,
         checkpoint_callback,
         lr_monitor,
     ]
